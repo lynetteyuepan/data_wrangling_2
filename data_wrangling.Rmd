@@ -1,0 +1,63 @@
+---
+title: "data_wrangling"
+author: "Lynette Pan"
+date: "October 23, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(rvest)
+library(httr)
+```
+
+
+
+```{r} 
+url = "http://samhda.s3-us-gov-west-1.amazonaws.com/s3fs-public/field-uploads/2k15StateFiles/NSDUHsaeShortTermCHG2015.htm"
+drug_use_xml = read_html(url)
+
+drug_use_xml %>% 
+  html_nodes(css="table")
+
+#extract one of the tables; [[]] extract the first entry in the list
+
+table_marj = (drug_use_xml %>% html_nodes(css = "table"))[[1]] %>%
+  html_table() %>% 
+  .[-1,] %>% 
+  as_tibble()
+
+url_col = "https://www.bestplaces.net/cost_of_living/city/new_york/new_york"
+cost_xml = read_html(url_col)
+
+cost_xml %>% 
+  html_nodes(css="table")
+
+table_cost = (cost_xml %>% html_nodes(css = "table"))[[2]] %>%
+  html_table(header= TRUE)
+
+```
+
+```{r}
+hpss_html = read_html("http://www.imdb.com/title/tt0241527/")
+
+cast = hpss_html %>%
+  html_nodes(css = ".itemprop .itemprop") %>%
+  html_text()
+
+
+
+tooth_html = read_html("https://www.amazon.com/Philips-Sonicare-rechargeable-toothbrush-HX6211/product-reviews/B00YAR7ZFM/ref=cm_cr_arp_d_viewopt_srt?ie=UTF8&reviewerType=all_reviews&sortBy=recent&pageNumber=1")
+
+toothbrush_titles = tooth_html %>%
+  html_nodes(css= ".a-color-base") %>% 
+  html_text()
+
+nyc_water = GET("https://data.cityofnewyork.us/resource/waf7-5gvc.csv") %>% 
+  content("parsed")
+```
+
